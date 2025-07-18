@@ -73,17 +73,21 @@ WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+from urllib.parse import urlparse
+import os
+
+connection_string = os.environ['AZURE_POSTGRESQL_CONNECTIONSTRING']
+url = urlparse(connection_string)
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gestion_absencesApp',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        }
+        'NAME': url.path[1:],  # retire le slash initial
+        'USER': url.username,
+        'PASSWORD': url.password,
+        'HOST': url.hostname,
+        'PORT': url.port,
     }
 }
 
