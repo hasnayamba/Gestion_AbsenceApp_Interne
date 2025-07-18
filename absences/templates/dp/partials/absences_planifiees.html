@@ -1,0 +1,40 @@
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <label>Mois</label>
+    <select name="mois" class="form-select" onchange="this.form.submit()">
+      {% for numero, nom in mois_list %}
+        <option value="{{ numero }}" {% if mois_selectionne == numero %}selected{% endif %}>{{ nom }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label>Type</label>
+    <select name="type" class="form-select" onchange="this.form.submit()">
+      <option value="">Tous</option>
+      {% for type in types %}
+        <option value="{{ type.id }}" {% if type_selectionne == type.id %}selected{% endif %}>{{ type.nom }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>Collaborateur</th>
+      <th>Type</th>
+      <th>Dates</th>
+      <th>Statut</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for absence in absences_planifiees %}
+    <tr>
+      <td>{{ absence.collaborateur.get_full_name }}</td>
+      <td>{{ absence.type_absence.nom }}</td>
+      <td>{{ absence.date_debut }} → {{ absence.date_fin }} ({{ absence.nombre_jours }} jrs)</td>
+      <td>{{ absence.get_statut_display }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

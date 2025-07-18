@@ -1,0 +1,8 @@
+asgiref==3.9.1
+Django==5.2.4
+django-crispy-forms==2.4
+psycog==0.0.1
+python-dotenv==1.1.1
+sqlparse==0.5.3
+tzdata==2025.2
+whitenoise==6.9.0
