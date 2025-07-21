@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -39,12 +39,17 @@ jobs:
         run: ./venv/bin/pip install -r requirements.txt
 
       - name: Collect static files
-        env:                           # ✅ Les variables nécessaires sont injectées ici
+        env:
           DJANGO_SETTINGS_MODULE: gestion_absencesApp.settings
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
-        run: ./venv/bin/python manage.py collectstatic --noinput  # ✅ Appel propre sans source
+        run: ./venv/bin/python manage.py collectstatic --noinput
+
       - name: Migrate database
+        env:
+          DJANGO_SETTINGS_MODULE: gestion_absencesApp.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
         run: ./venv/bin/python manage.py migrate --noinput
 
       - name: Debug DNS et string
@@ -54,15 +59,14 @@ jobs:
           echo "Connexion DB = $AZURE_POSTGRESQL_CONNECTIONSTRING"
 
       - name: Créer superuser si inexistant
-        run: python manage.py create_superuser
-
-
-
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+        env:
+          DJANGO_SETTINGS_MODULE: gestion_absencesApp.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
+        run: ./venv/bin/python manage.py create_superuser
 
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x "venv/*"
-
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -71,6 +75,7 @@ jobs:
           path: |
             release.zip
             !venv/
+
 
   deploy:
     runs-on: ubuntu-latest
