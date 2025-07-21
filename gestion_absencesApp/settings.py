@@ -1,13 +1,17 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 # --- Chemins de base ---
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Clé secrète Django ---
-SECRET_KEY = os.environ.get("SECRET_KEY", "secret-key-par-defaut-pour-test-local")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("La variable d'environnement SECRET_KEY n'est pas définie.")
 
-DEBUG = True  # ⚠️ Passe à False en production
+# --- Mode DEBUG ---
+DEBUG = True  # ⚠️ Passe à False en production et utilise ALLOWED_HOSTS
 
 ALLOWED_HOSTS = ["gestionabsences.azurewebsites.net", "127.0.0.1", "localhost"]
 
@@ -20,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
-    'absences',
+    'absences',  # Ton app principale
 ]
 
 MIDDLEWARE = [
@@ -53,12 +57,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
-# --- ✅ BASE DE DONNÉES : SQLite (simple et stable pour Azure App Service) ---
+# --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(default=os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"), conn_max_age=600, ssl_require=True)
 }
 
 # --- Sécurité mot de passe ---
@@ -88,7 +91,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard_collaborateur'
 LOGOUT_REDIRECT_URL = 'login'
 
+# --- Clé par défaut pour les modèles ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- WhiteNoise pour servir les fichiers statiques sur Azure ---
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+

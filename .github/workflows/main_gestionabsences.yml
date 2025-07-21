@@ -53,6 +53,10 @@ jobs:
           ping -c 3 gestionabsences-server.postgres.database.azure.com || echo "DNS échec"
           echo "Connexion DB = $AZURE_POSTGRESQL_CONNECTIONSTRING"
 
+      - name: Créer superuser si inexistant
+        run: python manage.py create_superuser
+
+
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
