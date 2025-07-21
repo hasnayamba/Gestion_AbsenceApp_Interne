@@ -42,7 +42,7 @@ jobs:
 
       - name: Collect static files
         run: |
-          source env/bin/activate
+          source venv/bin/activate
           python manage.py collectstatic --noinput
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
