@@ -47,6 +47,12 @@ jobs:
       - name: Migrate database
         run: ./venv/bin/python manage.py migrate --noinput
 
+      - name: Debug DNS et string
+        run: |
+          echo "DNS resolution test"
+          ping -c 3 gestionabsences-server.postgres.database.azure.com || echo "DNS échec"
+          echo "Connexion DB = $AZURE_POSTGRESQL_CONNECTIONSTRING"
+
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
