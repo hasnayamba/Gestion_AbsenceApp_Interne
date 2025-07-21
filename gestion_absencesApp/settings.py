@@ -58,24 +58,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
-connection_string = os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING")
-if not connection_string:
-    raise RuntimeError("La variable d'environnement AZURE_POSTGRESQL_CONNECTIONSTRING n'est pas définie.")
-
-url = urlparse(connection_string)
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': url.path[1:],  # retire le slash initial
-        'USER': url.username,
-        'PASSWORD': url.password,
-        'HOST': url.hostname,
-        'PORT': url.port,
-        'OPTIONS': {
-    'sslmode': 'require',
-}
-    }
+    'default': dj_database_url.config(default=os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"), conn_max_age=600, ssl_require=True)
 }
 
 # --- Sécurité mot de passe ---
