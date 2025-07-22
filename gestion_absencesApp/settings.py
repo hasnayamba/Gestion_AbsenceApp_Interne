@@ -60,13 +60,19 @@ WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
 def parse_azure_connection_string(conn_str):
     if not conn_str:
-        raise RuntimeError("AZURE_POSTGRESQL_CONNECTIONSTRING est vide ou non défini")
+        raise RuntimeError("❌ La variable AZURE_POSTGRESQL_CONNECTIONSTRING est vide ou non définie.")
 
     try:
         parts = {}
         for item in conn_str.split():
-            k, v = item.split('=', 1)  # NE scinde qu'une seule fois à gauche
-            parts[k.strip()] = v.strip()
+            if '=' in item:
+                k, v = item.split('=', 1)
+                parts[k.strip()] = v.strip()
+
+        required_keys = ['dbname', 'user', 'password', 'host', 'port']
+        for key in required_keys:
+            if key not in parts:
+                raise RuntimeError(f"❌ Clé manquante dans la chaîne de connexion : {key}")
 
         return {
             'ENGINE': 'django.db.backends.postgresql',
@@ -80,7 +86,11 @@ def parse_azure_connection_string(conn_str):
             }
         }
     except Exception as e:
-        raise RuntimeError(f"Erreur de parsing AZURE_POSTGRESQL_CONNECTIONSTRING: {e}")
+        raise RuntimeError(f"Erreur dans parse_azure_connection_string: {e}")
+
+DATABASES = {
+    'default': parse_azure_connection_string(os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"))
+}
 
 # --- Sécurité mot de passe ---
 AUTH_PASSWORD_VALIDATORS = [
