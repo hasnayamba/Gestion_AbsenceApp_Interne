@@ -58,27 +58,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
-from urllib.parse import urlparse
-import os
+def parse_azure_connection_string(conn_str):
+    if not conn_str:
+        raise RuntimeError("AZURE_POSTGRESQL_CONNECTIONSTRING est vide ou non défini")
 
-connection_string = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING')
-if not connection_string:
-    raise RuntimeError("❌ La variable AZURE_POSTGRESQL_CONNECTIONSTRING n'est pas définie. Vérifie tes secrets GitHub ou la config Azure.")
+    try:
+        parts = {}
+        for item in conn_str.split():
+            k, v = item.split('=', 1)  # NE scinde qu'une seule fois à gauche
+            parts[k.strip()] = v.strip()
 
-url = urlparse(connection_string)
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': url.path[1:],  # retire le slash initial
-        'USER': url.username,
-        'PASSWORD': url.password,
-        'HOST': url.hostname,
-        'PORT': url.port,
-    }
-}
-
+        return {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parts['dbname'],
+            'USER': parts['user'],
+            'PASSWORD': parts['password'],
+            'HOST': parts['host'],
+            'PORT': parts['port'],
+            'OPTIONS': {
+                'sslmode': parts.get('sslmode', 'require')
+            }
+        }
+    except Exception as e:
+        raise RuntimeError(f"Erreur de parsing AZURE_POSTGRESQL_CONNECTIONSTRING: {e}")
 
 # --- Sécurité mot de passe ---
 AUTH_PASSWORD_VALIDATORS = [
