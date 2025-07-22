@@ -58,16 +58,34 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
-import dj_database_url
+import os
+from urllib.parse import urlparse, parse_qs
 
+def parse_database_url(url):
+    if not url:
+        raise RuntimeError("❌ La variable AZURE_DATABASE_URL est vide ou non définie.")
+
+    result = urlparse(url)
+
+    if result.scheme != "postgres":
+        raise RuntimeError("❌ Seul le schéma 'postgres' est supporté dans AZURE_DATABASE_URL.")
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': result.path.lstrip("/"),
+        'USER': result.username,
+        'PASSWORD': result.password,
+        'HOST': result.hostname,
+        'PORT': result.port or 5432,
+        'OPTIONS': {
+            'sslmode': parse_qs(result.query).get('sslmode', ['require'])[0]
+        }
+    }
+
+# 🔧 Configuration de la base
 DATABASES = {
-    'default': dj_database_url.config(
-        env='AZURE_DATABASE_URL',
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': parse_database_url(os.environ.get("AZURE_DATABASE_URL"))
 }
-
 
 
 
