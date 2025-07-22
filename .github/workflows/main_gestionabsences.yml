@@ -34,6 +34,15 @@ jobs:
       - name: Install dependencies
         run: ./venv/bin/pip install -r requirements.txt
 
+      - name: Tester la connexion PostgreSQL (ping + port)
+        run: |
+            apt-get update && apt-get install -y iputils-ping netcat
+            echo "🔍 Ping DNS..."
+            ping -c 3 gestionbsencesapp-server.postgres.database.azure.com || true
+            echo "🔍 Test port 5432..."
+            nc -vz gestionbsencesapp-server.postgres.database.azure.com 5432 || true
+
+
       - name: Collect static files
         env:
           DJANGO_SETTINGS_MODULE: gestion_absencesApp.settings
