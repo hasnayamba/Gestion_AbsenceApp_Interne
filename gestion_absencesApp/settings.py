@@ -58,25 +58,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
+from urllib.parse import urlparse
 import os
 
-def parse_azure_connection_string(conn_str):
-    parts = dict(item.split('=') for item in conn_str.split())
-    return {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': parts['dbname'],
-        'USER': parts['user'],
-        'PASSWORD': parts['password'],
-        'HOST': parts['host'],
-        'PORT': parts['port'],
-        'OPTIONS': {
-            'sslmode': parts.get('sslmode', 'require')
-        }
-    }
+connection_string = os.environ.get('AZURE_POSTGRESQL_CONNECTIONSTRING')
+if not connection_string:
+    raise RuntimeError("❌ La variable AZURE_POSTGRESQL_CONNECTIONSTRING n'est pas définie. Vérifie tes secrets GitHub ou la config Azure.")
+
+url = urlparse(connection_string)
+
 
 DATABASES = {
-    'default': parse_azure_connection_string(os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': url.path[1:],  # retire le slash initial
+        'USER': url.username,
+        'PASSWORD': url.password,
+        'HOST': url.hostname,
+        'PORT': url.port,
+    }
 }
+
 
 # --- Sécurité mot de passe ---
 AUTH_PASSWORD_VALIDATORS = [
