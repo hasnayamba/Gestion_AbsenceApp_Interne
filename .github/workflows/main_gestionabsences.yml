@@ -55,7 +55,7 @@ jobs:
       - name: Debug DNS et string
         run: |
           echo "DNS resolution test"
-          ping -c 3 gestionabsences-server.postgres.database.azure.com || echo "DNS échec"
+          ping -c 3 gestionbsences-server.postgres.database.azure.com || echo "DNS échec"
           echo "Connexion DB = $AZURE_POSTGRESQL_CONNECTIONSTRING"
 
       - name: Créer superuser si inexistant
