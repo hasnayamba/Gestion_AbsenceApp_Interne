@@ -58,43 +58,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
-def parse_azure_connection_string(conn_str):
-    if not conn_str:
-        raise RuntimeError("❌ La variable AZURE_POSTGRESQL_CONNECTIONSTRING est vide ou non définie.")
-
-    try:
-        parts = {}
-        for item in conn_str.split():
-            if '=' in item:
-                k, v = item.split('=', 1)
-                parts[k.strip()] = v.strip()
-
-        required_keys = ['dbname', 'user', 'password', 'host', 'port']
-        for key in required_keys:
-            if key not in parts:
-                raise RuntimeError(f"❌ Clé manquante dans la chaîne de connexion : {key}")
-
-        return {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': parts['dbname'],
-            'USER': parts['user'],
-            'PASSWORD': parts['password'],
-            'HOST': parts['host'],
-            'PORT': parts['port'],
-            'OPTIONS': {
-                'sslmode': parts.get('sslmode', 'require')
-            }
-        }
-    except Exception as e:
-        raise RuntimeError(f"Erreur dans parse_azure_connection_string: {e}")
-    print("🔍 Connexion brute:", os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"))
-
-
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(env='AZURE_DATABASE_URL', conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(
+        env='AZURE_DATABASE_URL',
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
+if not DATABASES['default']:
+    raise RuntimeError("❌ La base de données n'est pas configurée correctement. Vérifie AZURE_DATABASE_URL.")
+
 
 
 # --- Sécurité mot de passe ---
