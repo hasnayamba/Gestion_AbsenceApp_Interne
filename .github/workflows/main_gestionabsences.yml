@@ -34,6 +34,14 @@ jobs:
       - name: Install dependencies
         run: ./venv/bin/pip install -r requirements.txt
 
+
+      - name: Tester la résolution DNS vers PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dnsutils
+          nslookup gestionabsencesapp-server.postgres.database.azure.com || echo "Échec DNS"
+
+
       - name: Tester la connexion PostgreSQL (ping + port)
         run: |
             apt-get update && apt-get install -y iputils-ping netcat
