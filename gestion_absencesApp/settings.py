@@ -87,10 +87,15 @@ def parse_azure_connection_string(conn_str):
         }
     except Exception as e:
         raise RuntimeError(f"Erreur dans parse_azure_connection_string: {e}")
+    print("🔍 Connexion brute:", os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"))
+
+
+import dj_database_url
 
 DATABASES = {
-    'default': parse_azure_connection_string(os.environ.get("AZURE_POSTGRESQL_CONNECTIONSTRING"))
+    'default': dj_database_url.config(env='AZURE_DATABASE_URL', conn_max_age=600, ssl_require=True)
 }
+
 
 # --- Sécurité mot de passe ---
 AUTH_PASSWORD_VALIDATORS = [
