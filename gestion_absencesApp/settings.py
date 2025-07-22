@@ -8,7 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- Clé secrète Django ---
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
-    raise RuntimeError("La variable d'environnement SECRET_KEY n'est pas définie.")
+    # Pour les tests locaux uniquement (jamais en prod)
+    SECRET_KEY = "oWl4%z9r8tk2q3q0lzhn+9%&3w@z7b7b$+vmu^z4rp9t5!qhpb"
+    
 
 # --- Mode DEBUG ---
 DEBUG = True  # ⚠️ Passe à False en production et utilise ALLOWED_HOSTS
@@ -75,15 +77,15 @@ ALLOWED_HOSTS = ['*']
 # Base de données PostgreSQL sur Azure
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'gestionbsencesapp-database',
-        'USER': 'lrslwfbkpr',
-        'PASSWORD': 'qMGClFDHcxlQ$WNe',
-        'HOST': 'gestionabsencesapp-server.postgres.database.azure.com',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # ➤ comme dans PGDATABASE
+        'USER': 'adminuser',  # ⚠️ Azure exige le "@nomserveur"
+        'PASSWORD': '94649092Hiy',
+        'HOST': 'gestionabsence.postgres.database.azure.com',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
-        }
+        },
     }
 }
 
