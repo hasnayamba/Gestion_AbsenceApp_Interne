@@ -35,13 +35,6 @@ jobs:
         run: ./venv/bin/pip install -r requirements.txt
 
 
-      - name: Tester la résolution DNS vers PostgreSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dnsutils
-          echo "🔍 Test DNS vers Azure PostgreSQL..."
-          nslookup gestionabsencesapp-server.postgres.database.azure.com || echo "❌ DNS échec"
-
 
 
       - name: Tester la connexion PostgreSQL (ping + port)
@@ -110,10 +103,10 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Deploy to Azure Web App
+      - name: 📤 Déploiement sur Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'GestionAbsenceApp'  # ou le nom exact de ton App Service
+          app-name: 'gestionabsencesapp'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
 
@@ -123,10 +116,3 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'GestionAbsencesApp'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D340EA17717F43B68438F84A41C38B2E }}
