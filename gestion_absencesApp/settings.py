@@ -69,6 +69,7 @@ DATABASES = {
 }
 
 if not DATABASES['default']:
+    print("🔍 Contenu AZURE_DATABASE_URL :", os.environ.get("AZURE_DATABASE_URL"))
     raise RuntimeError("❌ La base de données n'est pas configurée correctement. Vérifie AZURE_DATABASE_URL.")
 
 
