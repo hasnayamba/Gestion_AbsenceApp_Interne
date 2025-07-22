@@ -82,7 +82,9 @@ jobs:
           DJANGO_SETTINGS_MODULE: gestion_absencesApp.settings
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           AZURE_POSTGRESQL_CONNECTIONSTRING: ${{ secrets.AZURE_POSTGRESQL_CONNECTIONSTRING }}
-        run: ./venv/bin/python manage.py create_superuser
+        run: ./venv/bin/python manage.py createsuperuser
+
+        
 
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x "venv/*"
