@@ -39,7 +39,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y dnsutils
-          nslookup gestionabsencesapp-server.postgres.database.azure.com || echo "Échec DNS"
+          echo "🔍 Test DNS vers Azure PostgreSQL..."
+          nslookup gestionabsencesapp-server.postgres.database.azure.com || echo "❌ DNS échec"
+
 
 
       - name: Tester la connexion PostgreSQL (ping + port)

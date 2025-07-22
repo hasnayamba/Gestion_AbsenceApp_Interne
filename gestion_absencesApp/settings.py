@@ -59,32 +59,32 @@ WSGI_APPLICATION = 'gestion_absencesApp.wsgi.application'
 
 # --- Base de données depuis AZURE_POSTGRESQL_CONNECTIONSTRING ---
 import os
-from urllib.parse import urlparse, parse_qs
+from pathlib import Path
 
-def parse_database_url(url):
-    if not url:
-        raise RuntimeError("❌ La variable AZURE_DATABASE_URL est vide ou non définie.")
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-    result = urlparse(url)
+# Clé secrète
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
-    if result.scheme != "postgres":
-        raise RuntimeError("❌ Seul le schéma 'postgres' est supporté dans AZURE_DATABASE_URL.")
+# DEBUG
+DEBUG = True
 
-    return {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': result.path.lstrip("/"),
-        'USER': result.username,
-        'PASSWORD': result.password,
-        'HOST': result.hostname,
-        'PORT': result.port or 5432,
+# Hôtes autorisés
+ALLOWED_HOSTS = ['*']
+
+# Base de données PostgreSQL sur Azure
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'gestionbsencesapp-database',
+        'USER': 'lrslwfbkpr',
+        'PASSWORD': 'qMGClFDHcxlQ$WNe',
+        'HOST': 'gestionabsencesapp-server.postgres.database.azure.com',
+        'PORT': '5432',
         'OPTIONS': {
-            'sslmode': parse_qs(result.query).get('sslmode', ['require'])[0]
+            'sslmode': 'require',
         }
     }
-
-# 🔧 Configuration de la base
-DATABASES = {
-    'default': parse_database_url(os.environ.get("AZURE_DATABASE_URL"))
 }
 
 
